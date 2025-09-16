@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ZendeskConfig::new(subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
-    println!("👤 Managing User Accounts Examples\n");
+    println!("Managing User Accounts Examples\n");
 
     // 1. Create a new end user
     println!("1. Creating a new end user...");
@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let created_user_id = match client.create_user(new_user).await {
         Ok(created_user) => {
-            println!("✓ Successfully created user!");
+            println!("Successfully created user!");
             println!("   ID: {}", created_user.id.unwrap_or(0));
             println!("   Name: {}", created_user.name);
             println!("   Email: {}", created_user.email);
@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             created_user.id.unwrap_or(0)
         }
         Err(e) => {
-            println!("❌ Failed to create user: {}", e);
+            println!("Failed to create user: {}", e);
             return Err(e.into());
         }
     };
@@ -73,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.update_user(created_user_id, user_update).await {
         Ok(updated_user) => {
-            println!("✓ Successfully updated user!");
+            println!("Successfully updated user!");
             println!("   ID: {}", updated_user.id.unwrap_or(0));
             println!("   Name: {} (updated)", updated_user.name);
             println!("   Email: {}", updated_user.email);
@@ -88,7 +88,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to update user: {}", e);
+            println!("Failed to update user: {}", e);
         }
     }
 
@@ -96,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n3. Fetching user details to verify updates...");
     match client.get_user(created_user_id).await {
         Ok(fetched_user) => {
-            println!("✓ Successfully fetched user details:");
+            println!("Successfully fetched user details:");
             println!("   ID: {}", fetched_user.id.unwrap_or(0));
             println!("   Name: {}", fetched_user.name);
             println!("   Email: {}", fetched_user.email);
@@ -131,7 +131,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to fetch user: {}", e);
+            println!("Failed to fetch user: {}", e);
         }
     }
 
@@ -142,14 +142,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
     {
         Ok(found_user) => {
-            println!("✓ Found user by email search:");
+            println!("Found user by email search:");
             println!("   ID: {}", found_user.id.unwrap_or(0));
             println!("   Name: {}", found_user.name);
             println!("   Email: {}", found_user.email);
             println!("   Role: {:?}", found_user.role);
         }
         Err(e) => {
-            println!("❌ Failed to find user by email: {}", e);
+            println!("Failed to find user by email: {}", e);
         }
     }
 
@@ -170,14 +170,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let second_user_id = match client.create_user(second_user).await {
         Ok(created_user) => {
-            println!("✓ Successfully created second user!");
+            println!("Successfully created second user!");
             println!("   ID: {}", created_user.id.unwrap_or(0));
             println!("   Name: {}", created_user.name);
             println!("   Email: {}", created_user.email);
             created_user.id.unwrap_or(0)
         }
         Err(e) => {
-            println!("❌ Failed to create second user: {}", e);
+            println!("Failed to create second user: {}", e);
             return Err(e.into());
         }
     };
@@ -191,7 +191,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .filter(|user| user.name.contains("Demo") || user.email.contains("demo"))
                 .collect();
 
-            println!("✓ Found {} demo users:", api_demo_users.len());
+            println!("Found {} demo users:", api_demo_users.len());
             for (i, user) in api_demo_users.iter().enumerate() {
                 println!(
                     "   {}. {} <{}> (ID: {}, Role: {:?})",
@@ -204,7 +204,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to search for demo users: {}", e);
+            println!("Failed to search for demo users: {}", e);
         }
     }
 
@@ -212,7 +212,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n7. Analyzing user account statistics...");
     match client.list_users().await {
         Ok(all_users) => {
-            println!("✓ User Account Statistics:");
+            println!("User Account Statistics:");
             println!("   Total users: {}", all_users.len());
 
             let active_users = all_users
@@ -259,7 +259,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("   Unique timezones: {}", timezones.len());
         }
         Err(e) => {
-            println!("❌ Failed to get user statistics: {}", e);
+            println!("Failed to get user statistics: {}", e);
         }
     }
 
@@ -269,34 +269,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Created demo users with IDs: {} and {}",
         created_user_id, second_user_id
     );
-    println!("⚠️  User deletion requires special permissions in many Zendesk instances.");
-    println!("⚠️  Demo users will remain active until manually removed by an admin.");
-    println!("📝 To delete users, you would use: client.delete_user(user_id)");
-    println!("📝 Consider deactivating users instead of deleting them to preserve ticket history.");
-
-    // Demonstrate how to "deactivate" by updating to inactive (if deletion is not allowed)
-    println!("\n   Demonstrating user deactivation instead of deletion...");
-    let deactivate_update = User::builder(
-        "Test User API Demo (DEACTIVATED)",
-        "testuser.api.demo@example.com",
-    )
-    .role(UserRole::EndUser)
-    .phone("+1-555-987-6543")
-    .notes("This user has been deactivated via API demo. Original data preserved.")
-    .tags(vec![
-        "api_test".to_string(),
-        "demo_user".to_string(),
-        "deactivated".to_string(),
-    ])
-    .time_zone("America/Los_Angeles")
-    .locale("en-US")
-    .build();
+    println!("User deletion requires special permissions in many Zendesk instances.");
+    println!("Demo users will remain active until manually removed by an admin.");
+    println!("To delete users, you would use: client.delete_user(user_id)");
+    println!("Consider deactivating users instead of deleting them to preserve ticket history.");
 
     // Note: In a real scenario, you'd set active: false, but our model doesn't expose that field in the create/update struct
     println!("   (In production, you would set the 'active' field to false to deactivate)");
 
-    println!("\n✅ User management examples completed!");
-    println!("\n📋 Summary of operations performed:");
+    println!("\nUser management examples completed!");
+    println!("\nSummary of operations performed:");
     println!("   - Created new end user with full profile");
     println!("   - Updated user information (name, phone, timezone, tags)");
     println!("   - Fetched user details to verify changes");

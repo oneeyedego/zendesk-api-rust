@@ -12,13 +12,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ZendeskConfig::new(subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
-    println!("🎫 Fetching Tickets Examples\n");
+    println!("Fetching Tickets Examples\n");
 
     // 1. List all tickets
     println!("1. Listing all tickets...");
     match client.list_tickets().await {
         Ok(tickets) => {
-            println!("✓ Found {} tickets", tickets.len());
+            println!("Found {} tickets", tickets.len());
             for (i, ticket) in tickets.iter().take(5).enumerate() {
                 println!(
                     "   {}. {} (ID: {}, Status: {:?})",
@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("\n2. Fetching detailed info for ticket ID {}...", ticket_id);
                     match client.get_ticket(ticket_id).await {
                         Ok(ticket_detail) => {
-                            println!("✓ Ticket Details:");
+                            println!("Ticket Details:");
                             println!("   Subject: {}", ticket_detail.subject);
                             if let Some(desc) = &ticket_detail.description {
                                 let short_desc = if desc.len() > 100 {
@@ -54,13 +54,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 println!("   Tags: {:?}", tags);
                             }
                         }
-                        Err(e) => println!("❌ Failed to fetch ticket details: {}", e),
+                        Err(e) => println!("Failed to fetch ticket details: {}", e),
                     }
                 }
             }
         }
         Err(e) => {
-            println!("❌ Failed to list tickets: {}", e);
+            println!("Failed to list tickets: {}", e);
         }
     }
 
@@ -68,13 +68,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n3. Searching tickets with keyword 'test'...");
     match client.search_tickets("test").await {
         Ok(search_results) => {
-            println!("✓ Found {} tickets matching 'test'", search_results.len());
+            println!("Found {} tickets matching 'test'", search_results.len());
             for ticket in search_results.iter().take(3) {
                 println!("   - {} (ID: {})", ticket.subject, ticket.id.unwrap_or(0));
             }
         }
         Err(e) => {
-            println!("❌ Search failed: {}", e);
+            println!("Search failed: {}", e);
         }
     }
 
@@ -90,19 +90,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             {
                 match client.list_tickets_assigned_to(user_id).await {
                     Ok(assigned_tickets) => {
-                        println!("✓ You have {} assigned tickets", assigned_tickets.len());
+                        println!("You have {} assigned tickets", assigned_tickets.len());
                         for ticket in assigned_tickets.iter().take(3) {
                             println!("   - {} (Priority: {:?})", ticket.subject, ticket.priority);
                         }
                     }
-                    Err(e) => println!("❌ Failed to fetch assigned tickets: {}", e),
+                    Err(e) => println!("Failed to fetch assigned tickets: {}", e),
                 }
             }
         }
-        Err(e) => println!("❌ Failed to get current user: {}", e),
+        Err(e) => println!("Failed to get current user: {}", e),
     }
 
-    println!("\n✅ Ticket fetching examples completed!");
+    println!("\nTicket fetching examples completed!");
 
     Ok(())
 }

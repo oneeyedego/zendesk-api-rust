@@ -12,14 +12,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ZendeskConfig::new(subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
-    println!("👥 Fetching Users Examples\n");
+    println!("Fetching Users Examples\n");
 
     // 1. Get current user info
     println!("1. Getting current user information...");
     match client.get::<serde_json::Value>("users/me.json").await {
         Ok(user_data) => {
             if let Some(user) = user_data.get("user") {
-                println!("✓ Current User Details:");
+                println!("Current User Details:");
                 if let Some(name) = user.get("name").and_then(|n| n.as_str()) {
                     println!("   Name: {}", name);
                 }
@@ -37,14 +37,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
-        Err(e) => println!("❌ Failed to get current user: {}", e),
+        Err(e) => println!("Failed to get current user: {}", e),
     }
 
     // 2. List all users
     println!("\n2. Listing all users...");
     match client.list_users().await {
         Ok(users) => {
-            println!("✓ Found {} users", users.len());
+            println!("Found {} users", users.len());
             for (i, user) in users.iter().take(5).enumerate() {
                 println!(
                     "   {}. {} <{}> (ID: {}, Role: {:?})",
@@ -65,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("\n3. Fetching detailed info for user ID {}...", user_id);
                     match client.get_user(user_id).await {
                         Ok(user_detail) => {
-                            println!("✓ User Details:");
+                            println!("User Details:");
                             println!("   Name: {}", user_detail.name);
                             println!("   Email: {}", user_detail.email);
                             println!("   Role: {:?}", user_detail.role);
@@ -83,13 +83,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 println!("   Tags: {:?}", tags);
                             }
                         }
-                        Err(e) => println!("❌ Failed to fetch user details: {}", e),
+                        Err(e) => println!("Failed to fetch user details: {}", e),
                     }
                 }
             }
         }
         Err(e) => {
-            println!("❌ Failed to list users: {}", e);
+            println!("Failed to list users: {}", e);
         }
     }
 
@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match client.search_users("@passmail.com").await {
         Ok(search_results) => {
             println!(
-                "✓ Found {} users with @passmail.com emails",
+                "Found {} users with @passmail.com emails",
                 search_results.len()
             );
             for user in search_results.iter().take(3) {
@@ -109,7 +109,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Search failed: {}", e);
+            println!("Search failed: {}", e);
         }
     }
 
@@ -120,7 +120,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
     {
         Ok(user) => {
-            println!("✓ Found user by email:");
+            println!("Found user by email:");
             println!("   Name: {}", user.name);
             println!("   ID: {}", user.id.unwrap_or(0));
             println!("   Role: {:?}", user.role);
@@ -129,7 +129,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to find user by email: {}", e);
+            println!("Failed to find user by email: {}", e);
         }
     }
 
@@ -143,7 +143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         match client.list_users_in_organization(org_id).await {
                             Ok(org_users) => {
                                 println!(
-                                    "✓ Found {} users in organization {}",
+                                    "Found {} users in organization {}",
                                     org_users.len(),
                                     org_id
                                 );
@@ -151,7 +151,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     println!("   - {} <{}>", user.name, &user.email);
                                 }
                             }
-                            Err(e) => println!("❌ Failed to fetch organization users: {}", e),
+                            Err(e) => println!("Failed to fetch organization users: {}", e),
                         }
                     }
                 } else {
@@ -159,10 +159,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
-        Err(e) => println!("❌ Failed to fetch organizations: {}", e),
+        Err(e) => println!("Failed to fetch organizations: {}", e),
     }
 
-    println!("\n✅ User fetching examples completed!");
+    println!("\nUser fetching examples completed!");
 
     Ok(())
 }

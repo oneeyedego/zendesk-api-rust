@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ZendeskConfig::new(subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
-    println!("🎫 Creating Tickets Examples\n");
+    println!("Creating Tickets Examples\n");
 
     // Get current user ID for ticket creation
     let current_user_id = match client.get::<serde_json::Value>("users/me.json").await {
@@ -23,7 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .and_then(|id| id.as_u64())
             .ok_or("Could not get current user ID")?,
         Err(e) => {
-            println!("❌ Failed to get current user: {}", e);
+            println!("Failed to get current user: {}", e);
             return Err(e.into());
         }
     };
@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.create_ticket(simple_ticket).await {
         Ok(created_ticket) => {
-            println!("✓ Successfully created ticket!");
+            println!("Successfully created ticket!");
             println!("   ID: {}", created_ticket.id.unwrap_or(0));
             println!("   Subject: {}", created_ticket.subject);
             println!("   Status: {:?}", created_ticket.status);
@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to create simple ticket: {}", e);
+            println!("Failed to create simple ticket: {}", e);
         }
     }
 
@@ -69,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.create_ticket(incident_ticket).await {
         Ok(created_ticket) => {
-            println!("✓ Successfully created incident ticket!");
+            println!("Successfully created incident ticket!");
             println!("   ID: {}", created_ticket.id.unwrap_or(0));
             println!("   Subject: {}", created_ticket.subject);
             println!("   Status: {:?}", created_ticket.status);
@@ -80,7 +80,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to create incident ticket: {}", e);
+            println!("Failed to create incident ticket: {}", e);
         }
     }
 
@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.create_ticket(task_ticket).await {
         Ok(created_ticket) => {
-            println!("✓ Successfully created task ticket!");
+            println!("Successfully created task ticket!");
             println!("   ID: {}", created_ticket.id.unwrap_or(0));
             println!("   Subject: {}", created_ticket.subject);
             println!("   Status: {:?}", created_ticket.status);
@@ -114,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
         }
         Err(e) => {
-            println!("❌ Failed to create task ticket: {}", e);
+            println!("Failed to create task ticket: {}", e);
         }
     }
 
@@ -164,7 +164,7 @@ This appears to be affecting approximately 15% of login attempts during peak hou
 
     match client.create_ticket(problem_ticket).await {
         Ok(created_ticket) => {
-            println!("✓ Successfully created problem ticket!");
+            println!("Successfully created problem ticket!");
             println!("   ID: {}", created_ticket.id.unwrap_or(0));
             println!("   Subject: {}", created_ticket.subject);
             println!("   Status: {:?}", created_ticket.status);
@@ -180,7 +180,7 @@ This appears to be affecting approximately 15% of login attempts during peak hou
             }
         }
         Err(e) => {
-            println!("❌ Failed to create problem ticket: {}", e);
+            println!("Failed to create problem ticket: {}", e);
         }
     }
 
@@ -194,7 +194,7 @@ This appears to be affecting approximately 15% of login attempts during peak hou
                 .take(10)
                 .collect();
 
-            println!("✓ Found {} recent API test tickets:", recent_tickets.len());
+            println!("Found {} recent API test tickets:", recent_tickets.len());
             for (i, ticket) in recent_tickets.iter().enumerate() {
                 println!(
                     "   {}. {} (ID: {}, Status: {:?}, Priority: {:?})",
@@ -207,18 +207,18 @@ This appears to be affecting approximately 15% of login attempts during peak hou
             }
         }
         Err(e) => {
-            println!("❌ Failed to search for test tickets: {}", e);
+            println!("Failed to search for test tickets: {}", e);
         }
     }
 
-    println!("\n✅ Ticket creation examples completed!");
-    println!("\n📋 Summary:");
+    println!("\nTicket creation examples completed!");
+    println!("\nSummary:");
     println!("   - Created simple support request");
     println!("   - Created high priority incident");
     println!("   - Created assigned task");
     println!("   - Created detailed problem report");
     println!(
-        "\n🧹 Cleanup Note: You may want to delete these test tickets from your Zendesk instance."
+        "\nCleanup Note: You may want to delete these test tickets from your Zendesk instance."
     );
 
     Ok(())

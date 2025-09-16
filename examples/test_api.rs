@@ -16,11 +16,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Validate configuration
     config.validate()?;
-    println!("✓ Configuration is valid");
+    println!("Configuration is valid");
 
     // Create client
     let client = ZendeskClient::new(config)?;
-    println!("✓ Client created successfully");
+    println!("Client created successfully");
 
     // Test API connection by fetching current user info
     println!("\nTesting API connection...");
@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Try to get current user information to verify the API works
     match client.get::<serde_json::Value>("users/me.json").await {
         Ok(user_data) => {
-            println!("✓ API connection successful!");
+            println!("API connection successful!");
             if let Some(user) = user_data.get("user") {
                 if let Some(name) = user.get("name").and_then(|n| n.as_str()) {
                     println!("  Authenticated as: {}", name);
@@ -45,12 +45,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ API connection failed: {}", e);
+            println!("API connection failed: {}", e);
             return Err(e.into());
         }
     }
 
-    println!("\n✓ Zendesk API client is ready for use!");
+    println!("\nZendesk API client is ready for use!");
 
     Ok(())
 }

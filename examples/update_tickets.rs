@@ -1,7 +1,5 @@
 use zendesk_api_rust::auth::AuthMethod;
-use zendesk_api_rust::models::ticket::{
-    Ticket, TicketComment, TicketPriority, TicketStatus, TicketType,
-};
+use zendesk_api_rust::models::ticket::{Ticket, TicketPriority, TicketStatus, TicketType};
 use zendesk_api_rust::{ZendeskClient, ZendeskConfig};
 
 #[tokio::main]
@@ -15,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ZendeskConfig::new(subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
-    println!("🔄 Updating Tickets Examples\n");
+    println!("Updating Tickets Examples\n");
 
     // Get current user ID
     let current_user_id = match client.get::<serde_json::Value>("users/me.json").await {
@@ -25,7 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .and_then(|id| id.as_u64())
             .ok_or("Could not get current user ID")?,
         Err(e) => {
-            println!("❌ Failed to get current user: {}", e);
+            println!("Failed to get current user: {}", e);
             return Err(e.into());
         }
     };
@@ -44,11 +42,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ticket_id = match client.create_ticket(test_ticket).await {
         Ok(created_ticket) => {
             let id = created_ticket.id.unwrap_or(0);
-            println!("✓ Created test ticket with ID: {}", id);
+            println!("Created test ticket with ID: {}", id);
             id
         }
         Err(e) => {
-            println!("❌ Failed to create test ticket: {}", e);
+            println!("Failed to create test ticket: {}", e);
             return Err(e.into());
         }
     };
@@ -65,14 +63,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.update_ticket(ticket_id, priority_update).await {
         Ok(updated_ticket) => {
-            println!("✓ Successfully updated ticket priority!");
+            println!("Successfully updated ticket priority!");
             println!("   ID: {}", updated_ticket.id.unwrap_or(0));
             println!("   Subject: {}", updated_ticket.subject);
             println!("   Priority: {:?} (was Low)", updated_ticket.priority);
             println!("   Status: {:?}", updated_ticket.status);
         }
         Err(e) => {
-            println!("❌ Failed to update ticket priority: {}", e);
+            println!("Failed to update ticket priority: {}", e);
         }
     }
 
@@ -89,7 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.update_ticket(ticket_id, status_update).await {
         Ok(updated_ticket) => {
-            println!("✓ Successfully updated ticket status and assignment!");
+            println!("Successfully updated ticket status and assignment!");
             println!("   ID: {}", updated_ticket.id.unwrap_or(0));
             println!("   Status: {:?} (was New)", updated_ticket.status);
             println!(
@@ -99,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("   Priority: {:?}", updated_ticket.priority);
         }
         Err(e) => {
-            println!("❌ Failed to update ticket status: {}", e);
+            println!("Failed to update ticket status: {}", e);
         }
     }
 
@@ -123,7 +121,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.update_ticket(ticket_id, tags_update).await {
         Ok(updated_ticket) => {
-            println!("✓ Successfully updated ticket type and tags!");
+            println!("Successfully updated ticket type and tags!");
             println!("   ID: {}", updated_ticket.id.unwrap_or(0));
             println!("   Type: {:?} (was Question)", updated_ticket.ticket_type);
             if let Some(tags) = &updated_ticket.tags {
@@ -131,7 +129,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to update ticket tags: {}", e);
+            println!("Failed to update ticket tags: {}", e);
         }
     }
 
@@ -154,7 +152,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match client.update_ticket(ticket_id, resolve_update).await {
         Ok(updated_ticket) => {
-            println!("✓ Successfully resolved the ticket!");
+            println!("Successfully resolved the ticket!");
             println!("   ID: {}", updated_ticket.id.unwrap_or(0));
             println!("   Subject: {}", updated_ticket.subject);
             println!("   Status: {:?} (was Open)", updated_ticket.status);
@@ -167,7 +165,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to resolve ticket: {}", e);
+            println!("Failed to resolve ticket: {}", e);
         }
     }
 
@@ -175,7 +173,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n5. Viewing final ticket state...");
     match client.get_ticket(ticket_id).await {
         Ok(final_ticket) => {
-            println!("✓ Final ticket state:");
+            println!("Final ticket state:");
             println!("   ID: {}", final_ticket.id.unwrap_or(0));
             println!("   Subject: {}", final_ticket.subject);
             println!("   Status: {:?}", final_ticket.status);
@@ -190,11 +188,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("   Created: {}", created_at);
             }
             if let Some(updated_at) = &final_ticket.updated_at {
-                println!("   Updated: {}", updated_at);
+                println!("   Last Updated: {}", updated_at);
             }
         }
         Err(e) => {
-            println!("❌ Failed to fetch final ticket state: {}", e);
+            println!("Failed to fetch final ticket state: {}", e);
         }
     }
 
@@ -213,7 +211,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             if !open_test_tickets.is_empty() {
                 println!(
-                    "✓ Found {} open test tickets to bulk update",
+                    "Found {} open test tickets to bulk update",
                     open_test_tickets.len()
                 );
 
@@ -235,8 +233,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             .build();
 
                         match client.update_ticket(tid, bulk_update).await {
-                            Ok(_) => println!("   ✓ Bulk updated ticket {}", tid),
-                            Err(e) => println!("   ❌ Failed to bulk update ticket {}: {}", tid, e),
+                            Ok(_) => println!("   Bulk updated ticket {}", tid),
+                            Err(e) => println!("   Failed to bulk update ticket {}: {}", tid, e),
                         }
                     }
                 }
@@ -245,12 +243,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Failed to search for test tickets: {}", e);
+            println!("Failed to search for test tickets: {}", e);
         }
     }
 
-    println!("\n✅ Ticket updating examples completed!");
-    println!("\n📋 Summary of operations performed:");
+    println!("\nTicket updating examples completed!");
+    println!("\nSummary of operations performed:");
     println!("   - Created test ticket (ID: {})", ticket_id);
     println!("   - Updated priority (Low → High → Normal)");
     println!("   - Changed status (New → Open → Solved)");
@@ -258,7 +256,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("   - Changed type (Question → Task)");
     println!("   - Added and modified tags");
     println!("   - Performed bulk updates on multiple tickets");
-    println!("\n🧹 Cleanup Note: Test tickets remain in your Zendesk instance for review.");
+    println!("\nCleanup Note: Test tickets remain in your Zendesk instance for review.");
 
     Ok(())
 }

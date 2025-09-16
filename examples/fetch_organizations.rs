@@ -12,13 +12,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ZendeskConfig::new(subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
-    println!("🏢 Fetching Organizations Examples\n");
+    println!("Fetching Organizations Examples\n");
 
     // 1. List all organizations
     println!("1. Listing all organizations...");
     match client.list_organizations().await {
         Ok(organizations) => {
-            println!("✓ Found {} organizations", organizations.len());
+            println!("Found {} organizations", organizations.len());
 
             if organizations.is_empty() {
                 println!("   No organizations found in this Zendesk instance.");
@@ -44,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         );
                         match client.get_organization(org_id).await {
                             Ok(org_detail) => {
-                                println!("✓ Organization Details:");
+                                println!("Organization Details:");
                                 println!("   Name: {}", org_detail.name);
                                 if let Some(details) = &org_detail.details {
                                     println!("   Details: {}", details);
@@ -70,14 +70,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     println!("   Updated: {}", updated_at);
                                 }
                             }
-                            Err(e) => println!("❌ Failed to fetch organization details: {}", e),
+                            Err(e) => println!("Failed to fetch organization details: {}", e),
                         }
 
                         // 3. Get users in this organization
                         println!("\n3. Fetching users in organization {}...", org_id);
                         match client.list_users_in_organization(org_id).await {
                             Ok(org_users) => {
-                                println!("✓ Found {} users in this organization", org_users.len());
+                                println!("Found {} users in this organization", org_users.len());
                                 for (i, user) in org_users.iter().take(5).enumerate() {
                                     println!(
                                         "   {}. {} <{}> (Role: {:?})",
@@ -91,14 +91,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     println!("   ... and {} more users", org_users.len() - 5);
                                 }
                             }
-                            Err(e) => println!("❌ Failed to fetch organization users: {}", e),
+                            Err(e) => println!("Failed to fetch organization users: {}", e),
                         }
                     }
                 }
             }
         }
         Err(e) => {
-            println!("❌ Failed to list organizations: {}", e);
+            println!("Failed to list organizations: {}", e);
         }
     }
 
@@ -107,7 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match client.search_organizations("test").await {
         Ok(search_results) => {
             println!(
-                "✓ Found {} organizations matching 'test'",
+                "Found {} organizations matching 'test'",
                 search_results.len()
             );
             for org in search_results.iter().take(3) {
@@ -115,7 +115,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Organization search failed: {}", e);
+            println!("Organization search failed: {}", e);
         }
     }
 
@@ -124,10 +124,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match client.search_organizations("domain:example.com").await {
         Ok(domain_results) => {
             if domain_results.is_empty() {
-                println!("✓ No organizations found with domain 'example.com'");
+                println!("No organizations found with domain 'example.com'");
             } else {
                 println!(
-                    "✓ Found {} organizations with domain 'example.com'",
+                    "Found {} organizations with domain 'example.com'",
                     domain_results.len()
                 );
                 for org in domain_results.iter() {
@@ -136,7 +136,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Err(e) => {
-            println!("❌ Domain search failed: {}", e);
+            println!("Domain search failed: {}", e);
         }
     }
 
@@ -144,7 +144,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n6. Organization Statistics Summary");
     match client.list_organizations().await {
         Ok(orgs) => {
-            println!("✓ Total Organizations: {}", orgs.len());
+            println!("Total Organizations: {}", orgs.len());
 
             // Count organizations with domains
             let orgs_with_domains = orgs
@@ -174,10 +174,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("   Unique domains: {:?}", all_domains);
             }
         }
-        Err(e) => println!("❌ Failed to get organizations for statistics: {}", e),
+        Err(e) => println!("Failed to get organizations for statistics: {}", e),
     }
 
-    println!("\n✅ Organization fetching examples completed!");
+    println!("\nOrganization fetching examples completed!");
 
     Ok(())
 }
