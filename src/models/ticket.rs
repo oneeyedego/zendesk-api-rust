@@ -220,9 +220,72 @@ pub struct TicketCommentCount {
     pub refreshed_at: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketCommentRequest {
+    pub ticket: TicketUpdate,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketUpdate {
+    pub comment: TicketCommentCreate,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<TicketStatus>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub priority: Option<TicketPriority>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub assignee_id: Option<u64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_id: Option<u64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketCommentCreate {
+    pub body: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub public: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub author_id: Option<u64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uploads: Option<Vec<String>>,
+}
+
 impl Ticket {
     pub fn builder(subject: impl Into<String>) -> TicketBuilder {
         TicketBuilder::new(subject)
+    }
+}
+
+impl TicketCommentCreate {
+    pub fn builder(body: impl Into<String>) -> TicketCommentBuilder {
+        TicketCommentBuilder::new(body)
+    }
+
+    pub fn public_response(body: impl Into<String>) -> Self {
+        Self {
+            body: body.into(),
+            public: Some(true),
+            author_id: None,
+            uploads: None,
+        }
+    }
+
+    pub fn work_note(body: impl Into<String>) -> Self {
+        Self {
+            body: body.into(),
+            public: Some(false),
+            author_id: None,
+            uploads: None,
+        }
     }
 }
 
@@ -303,6 +366,86 @@ impl TicketBuilder {
     pub fn build(self) -> TicketCreateRequest {
         TicketCreateRequest {
             ticket: self.ticket,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TicketCommentBuilder {
+    comment: TicketCommentCreate,
+}
+
+impl TicketCommentBuilder {
+    pub fn new(body: impl Into<String>) -> Self {
+        Self {
+            comment: TicketCommentCreate {
+                body: body.into(),
+                public: Some(true), // Default to public
+                author_id: None,
+                uploads: None,
+            },
+        }
+    }
+
+    pub fn public(mut self, is_public: bool) -> Self {
+        self.comment.public = Some(is_public);
+        self
+    }
+
+    pub fn work_note(mut self) -> Self {
+        self.comment.public = Some(false);
+        self
+    }
+
+    pub fn public_response(mut self) -> Self {
+        self.comment.public = Some(true);
+        self
+    }
+
+    pub fn author_id(mut self, author_id: u64) -> Self {
+        self.comment.author_id = Some(author_id);
+        self
+    }
+
+    pub fn uploads(mut self, uploads: Vec<String>) -> Self {
+        self.comment.uploads = Some(uploads);
+        self
+    }
+
+    pub fn build(self) -> TicketCommentCreate {
+        self.comment
+    }
+
+    pub fn build_request(self) -> TicketCommentRequest {
+        TicketCommentRequest {
+            ticket: TicketUpdate {
+                comment: self.comment,
+                status: None,
+                priority: None,
+                assignee_id: None,
+                group_id: None,
+                tags: None,
+            },
+        }
+    }
+
+    pub fn build_request_with_updates(
+        self,
+        status: Option<TicketStatus>,
+        priority: Option<TicketPriority>,
+        assignee_id: Option<u64>,
+        group_id: Option<u64>,
+        tags: Option<Vec<String>>,
+    ) -> TicketCommentRequest {
+        TicketCommentRequest {
+            ticket: TicketUpdate {
+                comment: self.comment,
+                status,
+                priority,
+                assignee_id,
+                group_id,
+                tags,
+            },
         }
     }
 }

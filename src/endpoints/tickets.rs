@@ -1,8 +1,8 @@
 use crate::client::ZendeskClient;
 use crate::errors::Result;
 use crate::models::ticket::{
-    Ticket, TicketComment, TicketCommentCountResponse, TicketCommentsResponse, TicketCreateRequest,
-    TicketResponse, TicketsResponse,
+    Ticket, TicketComment, TicketCommentCountResponse, TicketCommentCreate, TicketCommentRequest,
+    TicketCommentsResponse, TicketCreateRequest, TicketResponse, TicketsResponse,
 };
 
 impl ZendeskClient {
@@ -109,5 +109,117 @@ impl ZendeskClient {
                 "Comment not found in response".to_string(),
             ))
         }
+    }
+
+    // Comment posting methods
+
+    /// Add a comment to an existing ticket
+    pub async fn add_ticket_comment(
+        &self,
+        ticket_id: u64,
+        comment_request: TicketCommentRequest,
+    ) -> Result<Ticket> {
+        let endpoint = format!("tickets/{}.json", ticket_id);
+        let response: TicketResponse = self.put(&endpoint, &comment_request).await?;
+        Ok(response.ticket)
+    }
+
+    /// Add a public response (visible to requester) to a ticket
+    pub async fn add_public_response(
+        &self,
+        ticket_id: u64,
+        body: impl Into<String>,
+    ) -> Result<Ticket> {
+        let comment = TicketCommentCreate::public_response(body);
+        let request = TicketCommentRequest {
+            ticket: crate::models::ticket::TicketUpdate {
+                comment,
+                status: None,
+                priority: None,
+                assignee_id: None,
+                group_id: None,
+                tags: None,
+            },
+        };
+        self.add_ticket_comment(ticket_id, request).await
+    }
+
+    /// Add a work note (internal note, not visible to requester) to a ticket
+    pub async fn add_work_note(&self, ticket_id: u64, body: impl Into<String>) -> Result<Ticket> {
+        let comment = TicketCommentCreate::work_note(body);
+        let request = TicketCommentRequest {
+            ticket: crate::models::ticket::TicketUpdate {
+                comment,
+                status: None,
+                priority: None,
+                assignee_id: None,
+                group_id: None,
+                tags: None,
+            },
+        };
+        self.add_ticket_comment(ticket_id, request).await
+    }
+
+    /// Add a comment with optional ticket updates (status, assignee, tags, etc.)
+    pub async fn add_comment_with_updates(
+        &self,
+        ticket_id: u64,
+        comment: TicketCommentCreate,
+        status: Option<crate::models::ticket::TicketStatus>,
+        assignee_id: Option<u64>,
+        tags: Option<Vec<String>>,
+    ) -> Result<Ticket> {
+        let request = TicketCommentRequest {
+            ticket: crate::models::ticket::TicketUpdate {
+                comment,
+                status,
+                priority: None,
+                assignee_id,
+                group_id: None,
+                tags,
+            },
+        };
+        self.add_ticket_comment(ticket_id, request).await
+    }
+
+    /// Solve ticket with a public response
+    pub async fn solve_ticket_with_response(
+        &self,
+        ticket_id: u64,
+        body: impl Into<String>,
+    ) -> Result<Ticket> {
+        let comment = TicketCommentCreate::public_response(body);
+        let request = TicketCommentRequest {
+            ticket: crate::models::ticket::TicketUpdate {
+                comment,
+                status: Some(crate::models::ticket::TicketStatus::Solved),
+                priority: None,
+                assignee_id: None,
+                group_id: None,
+                tags: None,
+            },
+        };
+        self.add_ticket_comment(ticket_id, request).await
+    }
+
+    /// Change assignee with a work note
+    pub async fn reassign_ticket_with_note(
+        &self,
+        ticket_id: u64,
+        new_assignee_id: u64,
+        note: impl Into<String>,
+    ) -> Result<Ticket> {
+        let comment = TicketCommentCreate::work_note(note);
+        let request = TicketCommentRequest {
+            ticket: crate::models::ticket::TicketUpdate {
+                comment,
+                status: None,
+                priority: None,
+                assignee_id: Some(new_assignee_id),
+                group_id: None,
+                tags: None,
+            },
+        };
+        self.add_ticket_comment(ticket_id, request).await
     }
 }
