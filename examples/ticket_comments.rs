@@ -1,4 +1,5 @@
 use std::env;
+use zendesk_api_rust::auth::AuthMethod;
 use zendesk_api_rust::{ZendeskClient, ZendeskConfig};
 
 #[tokio::main]
@@ -8,8 +9,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let email = env::var("ZENDESK_EMAIL").expect("ZENDESK_EMAIL must be set");
     let api_token = env::var("ZENDESK_API_TOKEN").expect("ZENDESK_API_TOKEN must be set");
 
-    let config = ZendeskConfig::new(subdomain, email, api_token);
-    let client = ZendeskClient::new(config);
+    let config = ZendeskConfig::new(subdomain, AuthMethod::api_token(email, api_token));
+    let client = ZendeskClient::new(config)?;
 
     // Example ticket ID - replace with an actual ticket ID from your Zendesk
     let ticket_id = 1;
