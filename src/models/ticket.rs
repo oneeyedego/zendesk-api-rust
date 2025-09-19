@@ -4,45 +4,45 @@ use serde::{Deserialize, Serialize};
 pub struct Ticket {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
-    
+
     pub subject: String,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<TicketStatus>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub priority: Option<TicketPriority>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ticket_type: Option<TicketType>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requester_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assignee_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<Vec<CustomField>>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 }
@@ -51,20 +51,62 @@ pub struct Ticket {
 pub struct TicketComment {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
-    
+
     pub body: String,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub html_body: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plain_body: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub audit_id: Option<u64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub via: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attachments: Option<Vec<CommentAttachment>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CommentAttachment {
+    pub id: u64,
+    pub file_name: String,
+    pub content_url: String,
+    pub content_type: String,
+    pub size: u64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thumbnails: Option<Vec<AttachmentThumbnail>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inline: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deleted: Option<bool>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AttachmentThumbnail {
+    pub id: u64,
+    pub file_name: String,
+    pub content_url: String,
+    pub content_type: String,
+    pub size: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -111,25 +153,25 @@ pub struct TicketCreateRequest {
 pub struct TicketCreate {
     pub subject: String,
     pub comment: TicketComment,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub priority: Option<TicketPriority>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ticket_type: Option<TicketType>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<TicketStatus>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requester_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assignee_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
 }
@@ -142,15 +184,40 @@ pub struct TicketResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TicketsResponse {
     pub tickets: Vec<Ticket>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_page: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub previous_page: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub count: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketCommentsResponse {
+    pub comments: Vec<TicketComment>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_page: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub count: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketCommentCountResponse {
+    pub count: TicketCommentCount,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketCommentCount {
+    pub value: u64,
+    pub refreshed_at: String,
 }
 
 impl Ticket {
@@ -176,6 +243,11 @@ impl TicketBuilder {
                     created_at: None,
                     public: Some(true),
                     html_body: None,
+                    plain_body: None,
+                    audit_id: None,
+                    via: None,
+                    metadata: None,
+                    attachments: None,
                 },
                 priority: None,
                 ticket_type: None,
@@ -187,47 +259,47 @@ impl TicketBuilder {
             },
         }
     }
-    
+
     pub fn comment(mut self, body: impl Into<String>) -> Self {
         self.ticket.comment.body = body.into();
         self
     }
-    
+
     pub fn priority(mut self, priority: TicketPriority) -> Self {
         self.ticket.priority = Some(priority);
         self
     }
-    
+
     pub fn ticket_type(mut self, ticket_type: TicketType) -> Self {
         self.ticket.ticket_type = Some(ticket_type);
         self
     }
-    
+
     pub fn status(mut self, status: TicketStatus) -> Self {
         self.ticket.status = Some(status);
         self
     }
-    
+
     pub fn requester_id(mut self, requester_id: u64) -> Self {
         self.ticket.requester_id = Some(requester_id);
         self
     }
-    
+
     pub fn assignee_id(mut self, assignee_id: u64) -> Self {
         self.ticket.assignee_id = Some(assignee_id);
         self
     }
-    
+
     pub fn group_id(mut self, group_id: u64) -> Self {
         self.ticket.group_id = Some(group_id);
         self
     }
-    
+
     pub fn tags(mut self, tags: Vec<String>) -> Self {
         self.ticket.tags = Some(tags);
         self
     }
-    
+
     pub fn build(self) -> TicketCreateRequest {
         TicketCreateRequest {
             ticket: self.ticket,
