@@ -139,6 +139,8 @@ impl ZendeskClient {
                 assignee_id: None,
                 group_id: None,
                 tags: None,
+                additional_tags: None,
+                remove_tags: None,
             },
         };
         self.add_ticket_comment(ticket_id, request).await
@@ -155,6 +157,8 @@ impl ZendeskClient {
                 assignee_id: None,
                 group_id: None,
                 tags: None,
+                additional_tags: None,
+                remove_tags: None,
             },
         };
         self.add_ticket_comment(ticket_id, request).await
@@ -177,6 +181,8 @@ impl ZendeskClient {
                 assignee_id,
                 group_id: None,
                 tags,
+                additional_tags: None,
+                remove_tags: None,
             },
         };
         self.add_ticket_comment(ticket_id, request).await
@@ -197,6 +203,8 @@ impl ZendeskClient {
                 assignee_id: None,
                 group_id: None,
                 tags: None,
+                additional_tags: None,
+                remove_tags: None,
             },
         };
         self.add_ticket_comment(ticket_id, request).await
@@ -218,8 +226,142 @@ impl ZendeskClient {
                 assignee_id: Some(new_assignee_id),
                 group_id: None,
                 tags: None,
+                additional_tags: None,
+                remove_tags: None,
             },
         };
         self.add_ticket_comment(ticket_id, request).await
+    }
+
+    /// Add tags to a ticket without removing existing tags
+    pub async fn add_tags_to_ticket(&self, ticket_id: u64, tags: Vec<String>) -> Result<Ticket> {
+        self.update_ticket_properties(
+            ticket_id,
+            None,       // status
+            None,       // priority
+            None,       // assignee_id
+            None,       // group_id
+            None,       // replace_tags
+            Some(tags), // additional_tags
+            None,       // remove_tags
+        )
+        .await
+    }
+
+    /// Remove specific tags from a ticket
+    pub async fn remove_tags_from_ticket(
+        &self,
+        ticket_id: u64,
+        tags: Vec<String>,
+    ) -> Result<Ticket> {
+        self.update_ticket_properties(
+            ticket_id,
+            None,       // status
+            None,       // priority
+            None,       // assignee_id
+            None,       // group_id
+            None,       // replace_tags
+            None,       // additional_tags
+            Some(tags), // remove_tags
+        )
+        .await
+    }
+
+    /// Replace all tags on a ticket with new ones
+    pub async fn replace_ticket_tags(&self, ticket_id: u64, tags: Vec<String>) -> Result<Ticket> {
+        self.update_ticket_properties(
+            ticket_id,
+            None,       // status
+            None,       // priority
+            None,       // assignee_id
+            None,       // group_id
+            Some(tags), // replace_tags
+            None,       // additional_tags
+            None,       // remove_tags
+        )
+        .await
+    }
+
+    /// Manage tags with a custom comment
+    pub async fn manage_tags_with_comment(
+        &self,
+        ticket_id: u64,
+        comment_body: impl Into<String>,
+        is_public: bool,
+        replace_tags: Option<Vec<String>>,
+        add_tags: Option<Vec<String>>,
+        remove_tags: Option<Vec<String>>,
+    ) -> Result<Ticket> {
+        let comment = TicketCommentCreate {
+            body: comment_body.into(),
+            public: Some(is_public),
+            author_id: None,
+            uploads: None,
+        };
+        let request = TicketCommentRequest {
+            ticket: crate::models::ticket::TicketUpdate {
+                comment,
+                status: None,
+                priority: None,
+                assignee_id: None,
+                group_id: None,
+                tags: replace_tags,
+                additional_tags: add_tags,
+                remove_tags,
+            },
+        };
+        self.add_ticket_comment(ticket_id, request).await
+    }
+
+    /// Update ticket properties without adding a comment
+    pub async fn update_ticket_properties(
+        &self,
+        ticket_id: u64,
+        status: Option<crate::models::ticket::TicketStatus>,
+        priority: Option<crate::models::ticket::TicketPriority>,
+        assignee_id: Option<u64>,
+        group_id: Option<u64>,
+        tags: Option<Vec<String>>,
+        additional_tags: Option<Vec<String>>,
+        remove_tags: Option<Vec<String>>,
+    ) -> Result<Ticket> {
+        #[derive(serde::Serialize)]
+        struct TicketUpdateRequest {
+            ticket: TicketUpdateProperties,
+        }
+
+        #[derive(serde::Serialize)]
+        struct TicketUpdateProperties {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            status: Option<crate::models::ticket::TicketStatus>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            priority: Option<crate::models::ticket::TicketPriority>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            assignee_id: Option<u64>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            group_id: Option<u64>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            tags: Option<Vec<String>>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            additional_tags: Option<Vec<String>>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            remove_tags: Option<Vec<String>>,
+        }
+
+        let request = TicketUpdateRequest {
+            ticket: TicketUpdateProperties {
+                status,
+                priority,
+                assignee_id,
+                group_id,
+                tags,
+                additional_tags,
+                remove_tags,
+            },
+        };
+
+        let endpoint = format!("tickets/{}.json", ticket_id);
+        let response: TicketResponse = self.put(&endpoint, &request).await?;
+        Ok(response.ticket)
     }
 }

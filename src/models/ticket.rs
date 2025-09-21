@@ -243,6 +243,12 @@ pub struct TicketUpdate {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub additional_tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remove_tags: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -425,6 +431,8 @@ impl TicketCommentBuilder {
                 assignee_id: None,
                 group_id: None,
                 tags: None,
+                additional_tags: None,
+                remove_tags: None,
             },
         }
     }
@@ -445,6 +453,32 @@ impl TicketCommentBuilder {
                 assignee_id,
                 group_id,
                 tags,
+                additional_tags: None,
+                remove_tags: None,
+            },
+        }
+    }
+
+    pub fn build_request_with_all_updates(
+        self,
+        status: Option<TicketStatus>,
+        priority: Option<TicketPriority>,
+        assignee_id: Option<u64>,
+        group_id: Option<u64>,
+        tags: Option<Vec<String>>,
+        additional_tags: Option<Vec<String>>,
+        remove_tags: Option<Vec<String>>,
+    ) -> TicketCommentRequest {
+        TicketCommentRequest {
+            ticket: TicketUpdate {
+                comment: self.comment,
+                status,
+                priority,
+                assignee_id,
+                group_id,
+                tags,
+                additional_tags,
+                remove_tags,
             },
         }
     }
