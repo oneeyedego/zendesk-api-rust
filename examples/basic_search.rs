@@ -1,6 +1,6 @@
 use std::env;
 use zendesk_api_rust::auth::AuthMethod;
-use zendesk_api_rust::models::{SearchQueryBuilder, SearchResult};
+use zendesk_api_rust::models::search::{SearchQueryBuilder, SearchResult};
 use zendesk_api_rust::{ZendeskClient, ZendeskConfig};
 
 #[tokio::main]

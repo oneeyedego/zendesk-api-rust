@@ -1,25 +1,32 @@
+use std::env;
 use zendesk_api_rust::auth::AuthMethod;
 use zendesk_api_rust::models::user::{User, UserRole};
 use zendesk_api_rust::{ZendeskClient, ZendeskConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Configuration - using your credentials
-    let subdomain = "mit-39553";
-    let email = "zendesk.path718@passmail.com";
-    let token = "1grbHhsHsS3LnUjllpmt98GX1oK8tnAwHclkFLZb";
+    // Load configuration from environment variables
+    let subdomain = env::var("ZENDESK_SUBDOMAIN").expect("ZENDESK_SUBDOMAIN must be set");
+    let email = env::var("ZENDESK_EMAIL").expect("ZENDESK_EMAIL must be set");
+    let token = env::var("ZENDESK_API_TOKEN").expect("ZENDESK_API_TOKEN must be set");
 
-    let auth = AuthMethod::api_token(email, token);
-    let config = ZendeskConfig::new(subdomain, auth);
+    let auth = AuthMethod::api_token(&email, &token);
+    let config = ZendeskConfig::new(&subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
     println!("Managing User Accounts Examples\n");
 
     // 1. Create a new end user
     println!("1. Creating a new end user...");
-    let new_user = User::builder("Test User API Demo", "testuser.api.demo@example.com")
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let unique_email = format!("testuser.{}.api.demo@example.com", timestamp);
+
+    let new_user = User::builder("Test User API Demo", &unique_email)
         .role(UserRole::EndUser)
-        .phone("+1-555-123-4567")
+        .phone("+15551234567")
         .notes("This is a test user created via the Zendesk API for demonstration purposes.")
         .tags(vec![
             "api_test".to_string(),
@@ -56,9 +63,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 2. Update the user's information
     println!("\n2. Updating user information...");
-    let user_update = User::builder("Test User API Demo (Updated)", "testuser.api.demo@example.com")
+    let user_update = User::builder("Test User API Demo (Updated)", &unique_email)
         .role(UserRole::EndUser)
-        .phone("+1-555-987-6543")  // Changed phone number
+        .phone("+15559876543")  // Changed phone number
         .notes("This user's information has been updated via the API. Phone number changed and additional tags added.")
         .tags(vec![
             "api_test".to_string(),
@@ -137,10 +144,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 4. Search for the user by email
     println!("\n4. Searching for user by email...");
-    match client
-        .get_user_by_email("testuser.api.demo@example.com")
-        .await
-    {
+    match client.get_user_by_email(&unique_email).await {
         Ok(found_user) => {
             println!("Found user by email search:");
             println!("   ID: {}", found_user.id.unwrap_or(0));
@@ -155,9 +159,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 5. Create a second user to demonstrate bulk operations
     println!("\n5. Creating a second demo user for bulk operations...");
-    let second_user = User::builder("Demo User Two", "demouser2.api.test@example.com")
+    let second_unique_email = format!("demouser2.{}.api.test@example.com", timestamp + 1);
+    let second_user = User::builder("Demo User Two", &second_unique_email)
         .role(UserRole::EndUser)
-        .phone("+1-555-111-2222")
+        .phone("+15551112222")
         .notes("Second demo user for bulk operations testing.")
         .tags(vec![
             "api_test".to_string(),

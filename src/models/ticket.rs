@@ -55,7 +55,7 @@ pub struct TicketComment {
     pub body: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub author_id: Option<u64>,
+    pub author_id: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
@@ -80,6 +80,19 @@ pub struct TicketComment {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachments: Option<Vec<CommentAttachment>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ticket_id: Option<u64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    pub comment_type: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uploads: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_attachment_urls: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -317,6 +330,10 @@ impl TicketBuilder {
                     via: None,
                     metadata: None,
                     attachments: None,
+                    ticket_id: None,
+                    comment_type: None,
+                    uploads: None,
+                    external_attachment_urls: None,
                 },
                 priority: None,
                 ticket_type: None,

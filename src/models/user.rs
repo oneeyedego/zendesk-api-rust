@@ -1,46 +1,52 @@
 use serde::{Deserialize, Serialize};
 
+// Import CustomField from ticket module for consistency
+use crate::models::ticket::CustomField;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u64>,
-    
+
     pub name: String,
     pub email: String,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role: Option<UserRole>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
-    
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<Vec<CustomField>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_zone: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verified: Option<bool>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 }
@@ -63,25 +69,28 @@ pub struct UserCreateRequest {
 pub struct UserCreate {
     pub name: String,
     pub email: String,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role: Option<UserRole>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<u64>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
-    
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<Vec<CustomField>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_zone: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<String>,
 }
@@ -94,13 +103,13 @@ pub struct UserResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UsersResponse {
     pub users: Vec<User>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_page: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub previous_page: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub count: Option<u64>,
 }
@@ -127,50 +136,54 @@ impl UserBuilder {
                 phone: None,
                 notes: None,
                 tags: None,
+                custom_fields: None,
                 time_zone: None,
                 locale: None,
             },
         }
     }
-    
+
     pub fn role(mut self, role: UserRole) -> Self {
         self.user.role = Some(role);
         self
     }
-    
+
     pub fn organization_id(mut self, organization_id: u64) -> Self {
         self.user.organization_id = Some(organization_id);
         self
     }
-    
+
     pub fn phone(mut self, phone: impl Into<String>) -> Self {
         self.user.phone = Some(phone.into());
         self
     }
-    
+
     pub fn notes(mut self, notes: impl Into<String>) -> Self {
         self.user.notes = Some(notes.into());
         self
     }
-    
+
     pub fn tags(mut self, tags: Vec<String>) -> Self {
         self.user.tags = Some(tags);
         self
     }
-    
+
+    pub fn custom_fields(mut self, custom_fields: Vec<CustomField>) -> Self {
+        self.user.custom_fields = Some(custom_fields);
+        self
+    }
+
     pub fn time_zone(mut self, time_zone: impl Into<String>) -> Self {
         self.user.time_zone = Some(time_zone.into());
         self
     }
-    
+
     pub fn locale(mut self, locale: impl Into<String>) -> Self {
         self.user.locale = Some(locale.into());
         self
     }
-    
+
     pub fn build(self) -> UserCreateRequest {
-        UserCreateRequest {
-            user: self.user,
-        }
+        UserCreateRequest { user: self.user }
     }
 }

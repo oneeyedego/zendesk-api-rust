@@ -1,15 +1,16 @@
+use std::env;
 use zendesk_api_rust::auth::AuthMethod;
 use zendesk_api_rust::{ZendeskClient, ZendeskConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Configuration - using your credentials
-    let subdomain = "mit-39553";
-    let email = "zendesk.path718@passmail.com";
-    let token = "1grbHhsHsS3LnUjllpmt98GX1oK8tnAwHclkFLZb";
+    // Load configuration from environment variables
+    let subdomain = env::var("ZENDESK_SUBDOMAIN").expect("ZENDESK_SUBDOMAIN must be set");
+    let email = env::var("ZENDESK_EMAIL").expect("ZENDESK_EMAIL must be set");
+    let token = env::var("ZENDESK_API_TOKEN").expect("ZENDESK_API_TOKEN must be set");
 
-    let auth = AuthMethod::api_token(email, token);
-    let config = ZendeskConfig::new(subdomain, auth);
+    let auth = AuthMethod::api_token(&email, &token);
+    let config = ZendeskConfig::new(&subdomain, auth);
     let client = ZendeskClient::new(config)?;
 
     println!("Fetching Users Examples\n");

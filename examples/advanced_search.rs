@@ -1,6 +1,7 @@
 use std::env;
 use zendesk_api_rust::auth::AuthMethod;
-use zendesk_api_rust::models::{SearchQueryBuilder, SearchResult, SearchSortBy, SortOrder};
+use zendesk_api_rust::models::search::{SearchQueryBuilder, SearchResult, SearchSortBy};
+use zendesk_api_rust::query::SortOrder;
 use zendesk_api_rust::{ZendeskClient, ZendeskConfig};
 
 #[tokio::main]
@@ -84,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .priority("urgent")
                 .created_after("2024-01-01"),
             SearchSortBy::CreatedAt,
-            SortOrder::Descending,
+            SortOrder::Desc,
         )
         .await
     {
@@ -205,11 +206,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Complex query: {}", complex_query);
 
     match client
-        .search_with_sort(
-            &complex_query,
-            SearchSortBy::Priority,
-            SortOrder::Descending,
-        )
+        .search_with_sort(&complex_query, SearchSortBy::Priority, SortOrder::Desc)
         .await
     {
         Ok(response) => {

@@ -1,4 +1,5 @@
 use crate::models::{organization::Organization, ticket::Ticket, user::User};
+use crate::query::SortOrder;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -47,13 +48,7 @@ pub struct Group {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SearchCountResponse {
-    pub count: SearchCount,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SearchCount {
-    pub value: u64,
-    pub refreshed_at: String,
+    pub count: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -236,14 +231,6 @@ pub enum SearchSortBy {
     TicketType,
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub enum SortOrder {
-    #[serde(rename = "asc")]
-    Ascending,
-    #[serde(rename = "desc")]
-    Descending,
-}
-
 impl std::fmt::Display for SearchSortBy {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -259,8 +246,8 @@ impl std::fmt::Display for SearchSortBy {
 impl std::fmt::Display for SortOrder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SortOrder::Ascending => write!(f, "asc"),
-            SortOrder::Descending => write!(f, "desc"),
+            SortOrder::Asc => write!(f, "asc"),
+            SortOrder::Desc => write!(f, "desc"),
         }
     }
 }

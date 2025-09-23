@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 
+// Import CustomField from ticket module for consistency
+use crate::models::ticket::CustomField;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Organization {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -18,6 +21,9 @@ pub struct Organization {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<Vec<CustomField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_id: Option<String>,
@@ -52,6 +58,9 @@ pub struct OrganizationCreate {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<Vec<CustomField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_id: Option<String>,
@@ -96,6 +105,7 @@ impl OrganizationBuilder {
                 notes: None,
                 domain_names: None,
                 tags: None,
+                custom_fields: None,
                 external_id: None,
             },
         }
@@ -118,6 +128,11 @@ impl OrganizationBuilder {
 
     pub fn tags(mut self, tags: Vec<String>) -> Self {
         self.organization.tags = Some(tags);
+        self
+    }
+
+    pub fn custom_fields(mut self, custom_fields: Vec<CustomField>) -> Self {
+        self.organization.custom_fields = Some(custom_fields);
         self
     }
 

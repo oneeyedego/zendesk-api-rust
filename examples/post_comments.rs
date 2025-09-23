@@ -84,6 +84,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     assignee_id: None,
                     group_id: None,
                     tags: None,
+                    additional_tags: None,
+                    remove_tags: None,
                 },
             },
         )

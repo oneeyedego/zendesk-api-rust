@@ -2,8 +2,8 @@ use crate::client::ZendeskClient;
 use crate::errors::Result;
 use crate::models::search::{
     SearchCountResponse, SearchExportResponse, SearchQueryBuilder, SearchResponse, SearchSortBy,
-    SortOrder,
 };
+use crate::query::SortOrder;
 
 impl ZendeskClient {
     /// Search across tickets, users, organizations, and groups
@@ -45,7 +45,7 @@ impl ZendeskClient {
     pub async fn search_count(&self, query: &str) -> Result<u64> {
         let endpoint = format!("search/count.json?query={}", urlencoding::encode(query));
         let response: SearchCountResponse = self.get(&endpoint).await?;
-        Ok(response.count.value)
+        Ok(response.count)
     }
 
     /// Export search results (for large result sets over 1,000 results)

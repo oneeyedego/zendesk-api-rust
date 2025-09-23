@@ -4,6 +4,8 @@ use crate::models::ticket::{
     Ticket, TicketComment, TicketCommentCountResponse, TicketCommentCreate, TicketCommentRequest,
     TicketCommentsResponse, TicketCreateRequest, TicketResponse, TicketsResponse,
 };
+use crate::query::QueryParams;
+use crate::query::{SideloadedResponse, TicketsWithSideloading};
 
 impl ZendeskClient {
     pub async fn create_ticket(&self, ticket_request: TicketCreateRequest) -> Result<Ticket> {
@@ -15,6 +17,16 @@ impl ZendeskClient {
         let endpoint = format!("tickets/{}.json", ticket_id);
         let response: TicketResponse = self.get(&endpoint).await?;
         Ok(response.ticket)
+    }
+
+    /// Get a single ticket with side-loaded related resources
+    pub async fn get_ticket_with_sideloading(
+        &self,
+        ticket_id: u64,
+        include: &[&str],
+    ) -> Result<SideloadedResponse<TicketResponse>> {
+        let endpoint = format!("tickets/{}.json", ticket_id);
+        self.get_with_sideloading(&endpoint, include).await
     }
 
     pub async fn update_ticket(
@@ -38,16 +50,49 @@ impl ZendeskClient {
         Ok(response.tickets)
     }
 
+    /// List tickets with side-loaded related resources
+    pub async fn list_tickets_with_sideloading(
+        &self,
+        include: &[&str],
+    ) -> Result<TicketsWithSideloading> {
+        self.get_with_sideloading("tickets.json", include).await
+    }
+
+    /// List tickets with query parameters (pagination, sorting, etc.)
+    pub async fn list_tickets_with_params(&self, params: &QueryParams) -> Result<TicketsResponse> {
+        self.get_with_params("tickets.json", params).await
+    }
+
     pub async fn list_tickets_assigned_to(&self, assignee_id: u64) -> Result<Vec<Ticket>> {
         let endpoint = format!("users/{}/tickets/assigned.json", assignee_id);
         let response: TicketsResponse = self.get(&endpoint).await?;
         Ok(response.tickets)
     }
 
+    /// List tickets assigned to a user with side-loaded related resources
+    pub async fn list_tickets_assigned_to_with_sideloading(
+        &self,
+        assignee_id: u64,
+        include: &[&str],
+    ) -> Result<TicketsWithSideloading> {
+        let endpoint = format!("users/{}/tickets/assigned.json", assignee_id);
+        self.get_with_sideloading(&endpoint, include).await
+    }
+
     pub async fn list_tickets_requested_by(&self, requester_id: u64) -> Result<Vec<Ticket>> {
         let endpoint = format!("users/{}/tickets/requested.json", requester_id);
         let response: TicketsResponse = self.get(&endpoint).await?;
         Ok(response.tickets)
+    }
+
+    /// List tickets requested by a user with side-loaded related resources
+    pub async fn list_tickets_requested_by_with_sideloading(
+        &self,
+        requester_id: u64,
+        include: &[&str],
+    ) -> Result<TicketsWithSideloading> {
+        let endpoint = format!("users/{}/tickets/requested.json", requester_id);
+        self.get_with_sideloading(&endpoint, include).await
     }
 
     pub async fn search_tickets(&self, query: &str) -> Result<Vec<Ticket>> {
@@ -61,6 +106,16 @@ impl ZendeskClient {
         let endpoint = format!("tickets/{}/comments.json", ticket_id);
         let response: TicketCommentsResponse = self.get(&endpoint).await?;
         Ok(response.comments)
+    }
+
+    /// Get ticket comments with side-loaded related resources (e.g., users for comment authors)
+    pub async fn get_ticket_comments_with_sideloading(
+        &self,
+        ticket_id: u64,
+        include: &[&str],
+    ) -> Result<SideloadedResponse<TicketCommentsResponse>> {
+        let endpoint = format!("tickets/{}/comments.json", ticket_id);
+        self.get_with_sideloading(&endpoint, include).await
     }
 
     pub async fn get_ticket_comments_with_pagination(

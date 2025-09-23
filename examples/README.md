@@ -30,11 +30,6 @@ cargo run --example test_api
 cargo run --example fetch_tickets
 ```
 
-**Key Features**:
-- Shows ticket details including status, priority, tags
-- Demonstrates different search and filtering methods
-- Handles pagination and large result sets
-
 ### 3. `fetch_users.rs` - User Retrieval Operations
 **Purpose**: Demonstrate user account management and searching
 **What it demonstrates**:
@@ -50,11 +45,6 @@ cargo run --example fetch_tickets
 cargo run --example fetch_users
 ```
 
-**Key Features**:
-- User role identification (Admin, Agent, End User)
-- User profile details (timezone, locale, phone, etc.)
-- Organization membership information
-
 ### 4. `fetch_organizations.rs` - Organization Operations
 **Purpose**: Demonstrate organization management and user relationships
 **What it demonstrates**:
@@ -68,11 +58,6 @@ cargo run --example fetch_users
 ```bash
 cargo run --example fetch_organizations
 ```
-
-**Key Features**:
-- Organization domain management
-- User-organization relationships
-- Tags and metadata handling
 
 ### 5. `create_tickets.rs` - Ticket Creation
 **Purpose**: Demonstrate creating various types of tickets
@@ -90,12 +75,6 @@ cargo run --example fetch_organizations
 cargo run --example create_tickets
 ```
 
-**Key Features**:
-- Ticket builder pattern for easy construction
-- Multiple ticket types and priorities
-- Automatic requester and assignee handling
-- Tag and metadata assignment
-
 ### 6. `update_tickets.rs` - Ticket Modification
 **Purpose**: Demonstrate ticket updating and lifecycle management
 **What it demonstrates**:
@@ -112,12 +91,6 @@ cargo run --example create_tickets
 cargo run --example update_tickets
 ```
 
-**Key Features**:
-- Step-by-step ticket progression
-- Comment addition with updates
-- Assignment and ownership changes
-- Bulk operations on multiple tickets
-
 ### 7. `manage_users.rs` - User Account Management
 **Purpose**: Demonstrate user creation, modification, and management
 **What it demonstrates**:
@@ -132,82 +105,152 @@ cargo run --example update_tickets
 cargo run --example manage_users
 ```
 
-**Key Features**:
-- Complete user profile management
-- Role assignments and changes
-- Contact information handling
-- User lifecycle management
+### 8. `ticket_comments.rs` - Ticket Comment Retrieval
+**Purpose**: Demonstrate fetching and reading ticket comments
+**What it demonstrates**:
+- Get all comments for a specific ticket
+- Comment pagination handling
+- Display comment metadata (author, timestamp, visibility)
+- Comment count and statistics
 
-## Running All Examples
-
-To test all examples in sequence:
-
+**Usage**:
 ```bash
-# Test basic connection
-cargo run --example test_api
+cargo run --example ticket_comments
+```
 
-# Test all fetch operations
+### 9. `simple_comment_example.rs` - Basic Comment Operations
+**Purpose**: Simple examples of adding comments to tickets
+**What it demonstrates**:
+- Add public responses (visible to customers)
+- Add internal work notes (agent-only)
+- Basic comment creation patterns
+
+**Usage**:
+```bash
+cargo run --example simple_comment_example
+```
+
+### 10. `post_comments.rs` - Advanced Comment Operations
+**Purpose**: Comprehensive comment management and ticket updates
+**What it demonstrates**:
+- Public customer responses
+- Internal work notes
+- Solving tickets with responses
+- Ticket reassignment with notes
+- Tag management with comments
+- Comment status updates
+
+**Usage**:
+```bash
+cargo run --example post_comments
+```
+
+### 11. `basic_search.rs` - Simple Search Operations
+**Purpose**: Demonstrate basic search functionality across Zendesk
+**What it demonstrates**:
+- Text-based ticket searches
+- User searches by email and name
+- Organization searches
+- Search result handling and display
+- Search query builder basics
+
+**Usage**:
+```bash
+cargo run --example basic_search
+```
+
+### 12. `advanced_search.rs` - Complex Search Operations
+**Purpose**: Advanced search capabilities and filtering
+**What it demonstrates**:
+- Complex search queries with multiple criteria
+- Search sorting and ordering
+- Date range searches
+- Status and priority filtering
+- Search pagination
+- Search result counting and export
+- Advanced query builder usage
+
+**Usage**:
+```bash
+cargo run --example advanced_search
+```
+
+### 13. `graph_relationships.rs` - Lookup Relationships
+**Purpose**: Demonstrate lookup relationship functionality for building connected data graphs
+**What it demonstrates**:
+- Side-loading related resources in single API calls
+- Creating lookup relationship fields
+- Traversing relationships between tickets, users, and organizations
+- Building data graphs from Zendesk relationships
+- Advanced relationship queries
+
+**Usage**:
+```bash
+cargo run --example graph_relationships
+```
+
+## Running Examples by Category
+
+### Basic Operations
+```bash
+cargo run --example test_api
 cargo run --example fetch_tickets
 cargo run --example fetch_users
 cargo run --example fetch_organizations
+```
 
-# Test creation and modification
+### Ticket Management
+```bash
 cargo run --example create_tickets
 cargo run --example update_tickets
+cargo run --example ticket_comments
+cargo run --example simple_comment_example
+cargo run --example post_comments
+```
+
+### Search and Discovery
+```bash
+cargo run --example basic_search
+cargo run --example advanced_search
+```
+
+### Advanced Features
+```bash
 cargo run --example manage_users
+cargo run --example graph_relationships
 ```
 
 ## Configuration
 
-All examples use the same configuration pattern:
+All examples use environment variables for configuration. Set up your `.env` file:
+
+```env
+ZENDESK_SUBDOMAIN=your-subdomain
+ZENDESK_EMAIL=your-email@domain.com
+ZENDESK_API_TOKEN=your-api-token
+```
+
+Examples load configuration like this:
 
 ```rust
-let subdomain = "your-subdomain";  // e.g., "company" for company.zendesk.com
-let email = "your-email@domain.com";
-let token = "your-api-token";
+let subdomain = env::var("ZENDESK_SUBDOMAIN").expect("ZENDESK_SUBDOMAIN must be set");
+let email = env::var("ZENDESK_EMAIL").expect("ZENDESK_EMAIL must be set");
+let api_token = env::var("ZENDESK_API_TOKEN").expect("ZENDESK_API_TOKEN must be set");
 
-let auth = AuthMethod::api_token(email, token);
-let config = ZendeskConfig::new(subdomain, auth);
+let config = ZendeskConfig::new(subdomain, AuthMethod::api_token(email, api_token));
 let client = ZendeskClient::new(config)?;
 ```
 
-## Test Data
+## Prerequisites
 
-The examples create test data with the following patterns:
-- **Tickets**: Prefixed with "API Test -" for easy identification
-- **Users**: Use "demo" or "test" in names/emails
-- **Tags**: Include "api_test" tag for filtering
+- Valid Zendesk instance with API access enabled
+- API token generated in Zendesk Admin Center
+- Environment variables configured
+- Some examples require existing tickets/users (will be noted in example output)
 
 ## Cleanup
 
 Most examples create test data that remains in your Zendesk instance:
 - Test tickets can be deleted manually or via API
 - Test users may require admin privileges to delete
-- Search for "api_test" tag to find all test data
-
-## Error Handling
-
-Examples demonstrate:
-- Proper error handling patterns
-- API rate limiting considerations
-- Network connectivity issues
-- Invalid data handling
-- Permission-based failures
-
-## API Coverage
-
-These examples cover the major Zendesk API endpoints:
-- **Tickets**: `/tickets.json`, `/tickets/{id}.json`, `/search.json`
-- **Users**: `/users.json`, `/users/{id}.json`, `/users/search.json`
-- **Organizations**: `/organizations.json`, `/organizations/{id}.json`
-- **Authentication**: All examples use API token authentication
-- **Error Handling**: Comprehensive error scenarios
-
-## Next Steps
-
-After running these examples:
-1. Review the test data created in your Zendesk instance
-2. Modify the examples for your specific use cases
-3. Implement proper error handling for production use
-4. Consider rate limiting for bulk operations
-5. Add logging and monitoring for production deployments
+- Search for the "api_test" tag to find all test data
