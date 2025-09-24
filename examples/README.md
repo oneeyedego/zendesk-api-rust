@@ -175,7 +175,33 @@ cargo run --example basic_search
 cargo run --example advanced_search
 ```
 
-### 13. `graph_relationships.rs` - Lookup Relationships
+### 13. `custom_objects.rs` - Custom Objects Management
+**Purpose**: Demonstrate custom objects API for creating and managing custom data structures
+**What it demonstrates**:
+- Check custom objects limits and current usage
+- List existing custom objects
+- Create new custom objects with full configuration
+- Update custom object properties (title, description, etc.)
+- Get custom object details and limits
+- List all fields for a custom object (including standard fields)
+- Create custom fields with various types (text, dropdown, checkbox, etc.)
+- Update field properties and configurations
+- Delete custom fields
+- Reorder field positions
+- Check field count limits
+- List records with filtering, sorting, and pagination
+- Create records with custom field data
+- Update existing record properties
+- Count total records
+- Bulk operations and job status tracking
+- Upsert operations (create or update by external ID)
+
+**Usage**:
+```bash
+cargo run --example custom_objects
+```
+
+### 14. `graph_relationships.rs` - Lookup Relationships
 **Purpose**: Demonstrate lookup relationship functionality for building connected data graphs
 **What it demonstrates**:
 - Side-loading related resources in single API calls
@@ -217,6 +243,7 @@ cargo run --example advanced_search
 ### Advanced Features
 ```bash
 cargo run --example manage_users
+cargo run --example custom_objects
 cargo run --example graph_relationships
 ```
 

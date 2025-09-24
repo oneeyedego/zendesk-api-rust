@@ -1,3 +1,4 @@
+pub mod custom_objects;
 pub mod organizations;
 pub mod relationships;
 pub mod search;

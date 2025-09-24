@@ -127,6 +127,33 @@ impl ZendeskClient {
         self.handle_response(response).await
     }
 
+    pub async fn patch<T, B>(&self, endpoint: &str, body: &B) -> Result<T>
+    where
+        T: DeserializeOwned,
+        B: Serialize,
+    {
+        let response = self
+            .request(Method::PATCH, endpoint, Some(body), None)
+            .await?;
+        self.handle_response(response).await
+    }
+
+    pub async fn patch_with_params<T, B>(
+        &self,
+        endpoint: &str,
+        body: &B,
+        params: &QueryParams,
+    ) -> Result<T>
+    where
+        T: DeserializeOwned,
+        B: Serialize,
+    {
+        let response = self
+            .request(Method::PATCH, endpoint, Some(body), Some(params))
+            .await?;
+        self.handle_response(response).await
+    }
+
     pub async fn delete<T>(&self, endpoint: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -221,11 +248,31 @@ impl ZendeskClient {
 
             // Try to parse error as JSON to get more details
             let error_message = if let Ok(error_json) = serde_json::from_str::<Value>(&error_text) {
-                error_json
-                    .get("error")
-                    .and_then(|e| e.as_str())
-                    .unwrap_or(&error_text)
-                    .to_string()
+                // For 422 errors, try to get detailed validation errors
+                if status.as_u16() == 422 {
+                    if let Some(details) = error_json.get("details") {
+                        format!("RecordInvalid - Details: {}", details.to_string())
+                    } else if let Some(errors) = error_json.get("errors") {
+                        format!("RecordInvalid - Errors: {}", errors.to_string())
+                    } else if let Some(description) = error_json.get("description") {
+                        format!(
+                            "RecordInvalid - {}",
+                            description.as_str().unwrap_or("Unknown validation error")
+                        )
+                    } else {
+                        error_json
+                            .get("error")
+                            .and_then(|e| e.as_str())
+                            .unwrap_or(&error_text)
+                            .to_string()
+                    }
+                } else {
+                    error_json
+                        .get("error")
+                        .and_then(|e| e.as_str())
+                        .unwrap_or(&error_text)
+                        .to_string()
+                }
             } else {
                 error_text
             };

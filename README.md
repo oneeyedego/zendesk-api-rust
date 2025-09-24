@@ -5,7 +5,7 @@ A Rust client library for the Zendesk ticketing system API.
 ## Features
 
 - Asynchronous API calls using `tokio` and `reqwest`
-- Models and endpoints for tickets, users, organizations, lookup relationships, and search
+- Models and endpoints for tickets, users, organizations, custom objects, lookup relationships, and search
 - Support for CRUD operations, sideloading, pagination, filtering, and advanced queries
 - Comprehensive ticket management including comments, tags, and workflow helpers
 - Advanced search capabilities with query builders and type-specific helpers
@@ -80,6 +80,41 @@ This library implements the following Zendesk API endpoints:
 - `PUT /api/v2/organizations/update_many` - Update multiple organizations
 - `POST /api/v2/organizations/{organization_id}/merge` - Merge organizations
 - `GET /api/v2/organizations/{organization_id}/related` - Show related organization information
+
+### Custom Objects
+**Implemented:**
+- `GET /api/v2/custom_objects` - List custom objects
+- `GET /api/v2/custom_objects/{custom_object_key}` - Show custom object
+- `POST /api/v2/custom_objects` - Create custom object
+- `PUT /api/v2/custom_objects/{custom_object_key}` - Update custom object
+- `DELETE /api/v2/custom_objects/{custom_object_key}` - Delete custom object
+- `GET /api/v2/custom_objects/limits/object_limit` - Check custom objects limit
+- `GET /api/v2/custom_objects/{key}/fields` - List custom object fields
+- `POST /api/v2/custom_objects/{key}/fields` - Create custom object field
+- `GET /api/v2/custom_objects/{key}/fields/{field_id}` - Show custom object field
+- `PATCH /api/v2/custom_objects/{key}/fields/{field_id}` - Update custom object field
+- `DELETE /api/v2/custom_objects/{key}/fields/{field_id}` - Delete custom object field
+- `PUT /api/v2/custom_objects/{key}/fields/reorder` - Reorder custom object fields
+- `GET /api/v2/custom_objects/{key}/limits/field_limit` - Check field limits
+- `GET /api/v2/custom_objects/{key}/records` - List custom object records (with filtering/sorting)
+- `GET /api/v2/custom_objects/{key}/records/{record_id}` - Show custom object record
+- `POST /api/v2/custom_objects/{key}/records` - Create custom object record
+- `PATCH /api/v2/custom_objects/{key}/records/{record_id}` - Update custom object record
+- `PATCH /api/v2/custom_objects/{key}/records` - Upsert custom object record (by external ID/name)
+- `DELETE /api/v2/custom_objects/{key}/records/{record_id}` - Delete custom object record
+- `GET /api/v2/custom_objects/{key}/records/count` - Count custom object records
+- `GET /api/v2/custom_objects/{key}/records/search` - Search custom object records (GET)
+- `POST /api/v2/custom_objects/{key}/records/search` - Search custom object records (POST with filters)
+- `POST /api/v2/custom_objects/{key}/jobs` - Create bulk job for records
+- `GET /api/v2/custom_objects/{key}/jobs/{job_id}` - Get bulk job status
+- `GET /api/v2/incremental/custom_objects/{key}/cursor` - Incremental export of records
+
+**Field Types Supported:**
+- Text, textarea, checkbox, date, integer, decimal, regexp, dropdown, lookup, multiselect
+- Full validation and relationship support
+
+**Not implemented:**
+- Custom object webhooks and triggers
 
 ### Search
 **Implemented:**
